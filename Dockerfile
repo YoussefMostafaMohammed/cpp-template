@@ -36,7 +36,6 @@ RUN curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor \
 # Workspace Setup
 # ============================================================
 WORKDIR /app
-
 ENV IN_DOCKER=1
 
 # Build configuration
@@ -50,36 +49,34 @@ ENV USE_CONAN=${USE_CONAN}
 # ============================================================
 COPY . .
 
-# Clean + re-create build folder
-RUN rm -rf build && mkdir -p build
-
 # ============================================================
 # Install Conan dependencies if enabled
 # ============================================================
 RUN if [ "$USE_CONAN" = "true" ]; then \
         echo "Installing dependencies via Conan..."; \
+        conan profile detect; \
         if [ "$BUILD_SYSTEM" = "cmake" ]; then \
             conan install . --output-folder=.conan --build=missing -g CMakeToolchain -g CMakeDeps; \
         elif [ "$BUILD_SYSTEM" = "bazel" ]; then \
             conan install . --output-folder=.conan --build=missing -g BazelDeps -g BazelToolchain; \
         else \
             echo "Unknown BUILD_SYSTEM=$BUILD_SYSTEM"; exit 1; \
-        fi \
+        fi; \
     else \
         echo "Conan disabled → using system packages only"; \
-        # Optionally patch Bazel BUILD files to remove Conan references here \
     fi
 
 # ============================================================
 # Build Phase
 # ============================================================
 RUN if [ "$BUILD_SYSTEM" = "cmake" ]; then \
+        mkdir -p build && cd build && \
         if [ "$USE_CONAN" = "true" ]; then \
-            cmake -B build -S . -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=.conan/conan_toolchain.cmake; \
+            cmake .. -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../.conan/conan_toolchain.cmake; \
         else \
-            cmake -B build -S . -DCMAKE_BUILD_TYPE=Debug; \
+            cmake .. -DCMAKE_BUILD_TYPE=Debug; \
         fi && \
-        cmake --build build -- -j$(nproc); \
+        cmake --build . -- -j$(nproc); \
     elif [ "$BUILD_SYSTEM" = "bazel" ]; then \
         if [ "$USE_CONAN" = "true" ]; then \
             bazel --bazelrc=.conan/conan_bzl.rc build --config=conan-config //src:main; \

@@ -1,7 +1,7 @@
 # cpp_template
 
 A **C++ project template** supporting multiple build systems and workflows: **CMake**, **Bazel**, **Docker**, and **Conan**.
-Designed for a clean C++17 setup with strict warnings, optional AddressSanitizer, and optional dependency management.
+Designed for a clean **C++17 setup** with strict compiler warnings, optional **AddressSanitizer**, and optional dependency management via **Conan**.
 
 ---
 
@@ -10,7 +10,6 @@ Designed for a clean C++17 setup with strict warnings, optional AddressSanitizer
 1. [Project Overview](#project-overview)
 2. [Project Structure](#project-structure)
 3. [Build Systems](#build-systems)
-
    * [CMake](#building-with-cmake)
    * [Bazel](#building-with-bazel)
 4. [Conan Integration](#conan-integration)
@@ -92,29 +91,30 @@ bazel --bazelrc=.conan/conan_bzl.rc build --config=conan-config //src:main
 ## Conan Integration
 
 * Conan is optional and can manage dependencies if needed.
-* Generators:
+* Generators per build system:
 
 | Build System | Generators                    |
 | ------------ | ----------------------------- |
 | CMake        | `CMakeToolchain`, `CMakeDeps` |
 | Bazel        | `BazelToolchain`, `BazelDeps` |
 
-* If no Conan, the project builds using system libraries only.
+* If Conan is not used, the project builds using system libraries only.
 
 ---
 
 ## Docker Workflow
 
-With the current **Dockerfile**, building and running your project is simple. The Docker container **automatically detects**:
+With the provided **Dockerfile**, building and running your project is simple. The container automatically detects:
 
-* Build system: CMake or Bazel (`$BUILD_SYSTEM`)
+* Build system: **CMake** or **Bazel** (`$BUILD_SYSTEM`)
 * Conan usage: enabled or disabled (`$USE_CONAN`)
 
 **Default usage (CMake + Conan):**
 
 ```bash
 docker build -t cpp_template:latest .
-docker run --rm -v $(pwd):/app -w /app cpp_template:latest
+docker run --rm cpp_template:latest
+
 ```
 
 **Customize build system or Conan usage:**
@@ -122,10 +122,11 @@ docker run --rm -v $(pwd):/app -w /app cpp_template:latest
 ```bash
 # Example: Bazel build without Conan
 docker build --build-arg BUILD_SYSTEM=bazel --build-arg USE_CONAN=false -t cpp_template:latest .
-docker run --rm -v $(pwd):/app -w /app cpp_template:latest
+docker run --rm cpp_template:latest
+
 ```
 
-> No long chained commands are needed; the Dockerfile handles Conan installation, toolchain configuration, and building automatically.
+> The Dockerfile handles Conan installation, toolchain configuration, and building automatically.
 
 ---
 
@@ -139,8 +140,8 @@ cmake --build build
 ```
 
 * Detects memory leaks, invalid reads/writes, and buffer overflows.
-* Works with both CMake and Docker workflows.
+* Works with both **CMake** and **Docker workflows**.
 
 ---
 
-This README now **matches your Dockerfile and CMakeLists**. Users only need **one Docker command** to build and run, while still allowing flexibility to switch build systems or disable Conan.
+This README now **matches your Dockerfile and CMakeLists.txt** and clearly documents the workflow for both local and containerized builds.
