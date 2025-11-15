@@ -1,0 +1,19 @@
+# ------------------------------------------------------------
+# Load Bazel C++ rules
+# ------------------------------------------------------------
+# cc_library allows you to define C++ libraries
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+# ------------------------------------------------------------
+# Group header files
+# ------------------------------------------------------------
+# filegroup is used to collect files without compiling them
+# Here we collect all header files in the current directory
+filegroup(
+    name = "log_headers",       # Name of this file group
+    srcs = glob(
+        ["*.hpp"],             # Match all .hpp files
+        allow_empty = True,    # Allow this to be empty without causing an error
+    ),
+    visibility = ["//visibility:public"],  # Make accessible to other Bazel targets
+)

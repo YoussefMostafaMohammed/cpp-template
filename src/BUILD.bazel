@@ -1,0 +1,26 @@
+# Load Bazel C++ rules
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary")
+
+# ------------------------------------------------------------
+# C++ library target
+# ------------------------------------------------------------
+cc_library(
+    name = "log_lib",                     # Library name
+    srcs = glob(["*.cpp"]),               # All .cpp files in this directory
+    hdrs = ["//inc:log_headers"],         # Header files from inc/ package
+    includes = ["../inc"],                # Additional include path
+    deps = [                              # List dependencies here (Conan deps can be added)
+        # Example: uncomment when using Conan deps
+        # "@fmt//:fmt", "@spdlog//:spdlog"
+    ],
+    visibility = ["//visibility:public"], # Make library visible to other targets
+)
+
+# ------------------------------------------------------------
+# C++ executable target
+# ------------------------------------------------------------
+cc_binary(
+    name = "main",        # Executable name
+    srcs = ["main.cpp"],  # Main source file
+    deps = [":log_lib"],  # Depends on log_lib
+)

@@ -1,0 +1,10 @@
+module(name = "cpp_template", version = "1.0.0")
+
+# Rules for C++
+bazel_dep(name = "rules_cc", version = "0.2.14")
+
+# Load Conan extension (optional, no hardcoded deps)
+load_conan_dependencies = use_extension("//.conan:conan_deps_module_extension.bzl", "conan_extension")
+
+# Example of adding dependencies (currently commented out) as example
+# use_repo(load_conan_dependencies, "fmt", "spdlog")
